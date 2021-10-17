@@ -1,0 +1,63 @@
+plugins {
+	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	id 'java'
+}
+
+// jar包的名字
+archivesBaseName = 'aop-log'
+
+group = 'org.wjw.bpoint'
+version = '2.5.1'
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+compileJava {
+  options.encoding = 'UTF-8'
+  options.deprecation = true
+  options.compilerArgs += ["-parameters","-Xlint:deprecation"]
+  
+  doFirst {
+    println "options:"+options
+    println "options.compilerArgs:"+options.compilerArgs
+  }
+  
+}
+
+compileTestJava {
+  options.encoding = 'UTF-8'
+  options.deprecation = true
+  options.compilerArgs += ["-parameters","-Xlint:deprecation"]
+          
+  doFirst {
+    println "options:"+options
+    println "options.compilerArgs:"+options.compilerArgs
+  }
+  
+}
+repositories {
+  mavenLocal()
+  maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }  //优先使用阿里的镜像
+  mavenCentral()
+}
+
+//To get the basic Spring Boot features into our starter,
+//we need to declare a dependency to the basic Spring Boot starter in our build.gradle file.
+dependencyManagement {
+  imports {
+      mavenBom("org.springframework.boot:spring-boot-dependencies:2.3.10.RELEASE")
+  }
+}
+
+dependencies {
+  implementation 'org.springframework.boot:spring-boot-starter-web'
+
+  //During the build, the metadata will be generated into the META-INF/spring-autoconfigure-metadata.properties file
+  annotationProcessor 'org.springframework.boot:spring-boot-autoconfigure-processor'
+  //This annotation processor will generate the file META-INF/spring-configuration-metadata.json
+  annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+    
+  //启用AOP
+  implementation 'org.springframework.boot:spring-boot-starter-aop'
+}
+
+compileJava.dependsOn(processResources)
