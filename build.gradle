@@ -1,15 +1,23 @@
+//打包: gradlew -x test clean build 成功后发布:gradlew -x test publish
+//然后登录https://oss.sonatype.org/#stagingRepositories来查看,你的提交在未处理前，是`open`状态，然后点击`Close`按钮;然后等一会点击`Release`来发布
+
 plugins {
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	id 'java'
+  id 'maven-publish'
+  id 'signing' //使用signing plugin做数字签名
 }
+
+apply from: rootDir.canonicalPath + '/.gradle/publish.gradle'
 
 // jar包的名字
 archivesBaseName = 'aop-log'
 
 group = 'org.wjw.bpoint'
-version = '2.5.1'
+version = '2.6'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 
 compileJava {
   options.encoding = 'UTF-8'
@@ -34,6 +42,86 @@ compileTestJava {
   }
   
 }
+
+jar {
+  manifest {
+    attributes 'Built-By': 'wjw465150@gmail.com',
+    'Build-Name': "${project.name}",
+    'Build-Version': "${project.version}",
+    'Build-URL': 'https://github.com/wjw465150/aop-log'
+  }
+  excludes = ['**/test/**']
+}
+
+java {
+  withJavadocJar()
+  withSourcesJar()
+}
+
+publishing {
+  // 定义发布什么
+  publications {
+    mavenJava(MavenPublication) {
+      // groupId,artifactId,version，如果不定义，则会按照默认值执行
+      groupId = "com.github.wjw465150"
+      artifactId = "aop-log"
+      version = project.version
+ 
+      //from components.java  //对应于非Spring Boot
+      artifact jar  //对于Spring Boot, jar is the default build task configured by Spring Boot
+      
+      pom {
+        // 构件名称
+        // 区别于artifactId，可以理解为artifactName
+        name = project.name
+        // 构件描述
+        description = 'aop-Log是基于SpringAop和ThreadLocal实现的一个对请求方法埋点信息收集与处理的日志工具包'
+        // 构件主页
+        url = 'https://github.com/wjw465150/aop-log'
+        // 许可证名称和地址
+        licenses {
+          license {
+            name = 'The Apache License, Version 2.0'
+            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution = 'aop-Log是基于SpringAop和ThreadLocal实现的一个对请求方法埋点信息收集与处理的日志工具包'
+          }
+        }
+        // 开发者信息
+        developers {
+          developer {
+            id = 'wjw465150'
+            name = 'wjw465150'
+            email = 'wjw465150@gmail.com'
+          }
+        }
+        // 版本控制仓库地址
+        scm {
+          url = "https://github.com/wjw465150/aop-log"
+          connection = "https://github.com/wjw465150/aop-log.git"
+          developerConnection = "https://github.com/wjw465150/aop-log.git"
+        }
+      }
+    }
+  }
+ 
+  // 定义发布到哪里
+  repositories {
+    maven {
+      url "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+      credentials {
+        // 这里就是之前在issues.sonatype.org注册的账号,这些敏感信息为了防止泄露,我放到了`.gradle/publish.gradle`目录下
+        username sonatypeUsername
+        password sonatypePassword
+      }
+    }
+  }
+}
+ 
+//为所有的jar包做数字签名
+signing {
+  sign publishing.publications.mavenJava
+}
+ 
 repositories {
   mavenLocal()
   maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }  //优先使用阿里的镜像

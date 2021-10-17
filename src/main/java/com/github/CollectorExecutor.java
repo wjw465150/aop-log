@@ -15,6 +15,7 @@ public class CollectorExecutor {
     /**
      * 异步 执行收集器
      *
+     * @param <D> the generic type
      * @param collector 收集器
      * @param data      数据对象
      */
@@ -26,6 +27,7 @@ public class CollectorExecutor {
     /**
      * 同步 执行收集器
      *
+     * @param <D> the generic type
      * @param collector 收集器
      * @param data      数据对象
      */

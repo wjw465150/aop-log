@@ -38,6 +38,8 @@ public class DataExtractor {
      */
     public static HttpServletRequest getRequest() {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        RequestContextHolder.setRequestAttributes(attributes,true);//设置子线程共享
+        
         return attributes != null ? attributes.getRequest() : null;
     }
 
@@ -48,6 +50,8 @@ public class DataExtractor {
      */
     public static HttpServletResponse getResponse() {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        RequestContextHolder.setRequestAttributes(attributes,true);//设置子线程共享
+        
         return attributes != null ? attributes.getResponse() : null;
     }
 
