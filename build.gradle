@@ -67,8 +67,15 @@ publishing {
       artifactId = "aop-log"
       version = project.version
  
-      //from components.java  //对应于非Spring Boot
-      artifact jar  //对于Spring Boot, jar is the default build task configured by Spring Boot
+      from components.java
+      versionMapping {  //为了解决: Gradle, SpringBoot, MavenPublish - Publication only contains dependencies and/or constraints without a version
+        usage('java-api') {
+          fromResolutionOf('runtimeClasspath')
+        }
+        usage('java-runtime') {
+          fromResolutionResult()
+        }
+      }
       
       pom {
         // 构件名称
