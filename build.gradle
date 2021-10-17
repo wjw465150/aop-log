@@ -14,7 +14,7 @@ apply from: rootDir.canonicalPath + '/.gradle/publish.gradle'
 archivesBaseName = 'aop-log'
 
 group = 'org.wjw.bpoint'
-version = '2.6'
+version = '2.7'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'

@@ -3,11 +3,6 @@ AopLog
 
 #### AopLog是基于SpringAop和ThreadLocal实现的一个对请求方法埋点信息收集与处理的日志工具包。
 
-![](https://img.shields.io/static/v1?label=release&message=2.5&color=green)
-![](https://img.shields.io/static/v1?label=jar&message=24k&color=green)
-![](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
-![](https://img.shields.io/badge/JDK-1.8+-red.svg)
-
 设计目的和场景 :
 
 - 使用Spring AOP拦截方法参数大部分做法基本上大同小异,不用每个项目工程都写AOP拦截处理日志的代码,引入此包即可。
@@ -19,14 +14,14 @@ AopLog
 - 只需通过`@AopLog`注解(或者自定义切面)决定是否埋点收集。
 ### 快速开始
 
-#### 项目通过[Maven仓库地址](https://mvnrepository.com/artifact/com.github.ealenxie/aop-log/2.5) 的pom.xml引入。
+#### 项目通过[Maven仓库地址](https://mvnrepository.com/artifact/com.github.wjw465150/aop-log/2.7) 的pom.xml引入。
 
 ```xml
 
 <dependency>
-    <groupId>com.github.ealenxie</groupId>
+    <groupId>com.github.wjw465150</groupId>
     <artifactId>aop-log</artifactId>
-    <version>2.5</version>
+    <version>2.7</version>
 </dependency>
 
 ```
@@ -34,7 +29,14 @@ AopLog
 #### 或者通过gradle引入
 
 ```gradle
-compile group: 'com.github.ealenxie', name: 'aop-log', version: '2.5'
+implementation group: 'com.github.wjw465150', name: 'aop-log', version: '2.7'
+```
+
+#### 在`application.properties`里配置异步记录的线程池(可选)
+```
+aop-log.thread-pool.corePoolSize=5
+aop-log.thread-pool.maxPoolSize=20
+aop-log.thread-pool.queueCapacity=256
 ```
 
 #### @AopLog注解使用，进行埋点收集
@@ -51,7 +53,7 @@ public class AppController {
 
     @GetMapping("/app/sayHello")
     public RespBody<String> sayHello() {
-        return RespBody.ok("hello EalenXie");
+        return RespBody.ok("hello aop-log");
     }
 
 }
@@ -72,7 +74,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * @author EalenXie create on 2020/9/15 13:46
+ * @author wjw465150 create on 2020/9/15 13:46
  * 此为样例参考
  * 配置一个简单的日志收集器 这里只是做了一个log.info打印一下，可以在这里写入到数据库中或者写入
  */
@@ -97,7 +99,7 @@ public class AopLogCollector implements LogCollector {
 接口调用 `/say/hello` 测试即可看看到控制台打印出结果 :
 
 ```
-2020-09-16 16:01:04.782  INFO 2012 --- [AsyncExecutor-2] name.ealen.infra.advice.AopLogCollector  : {"appName":"app-template","host":"127.0.0.1","port":8080,"clientIp":"192.168.110.1","reqUrl":"http://localhost:8080/app/sayHello","httpMethod":"GET","headers":{"User-Agent":"Apache-HttpClient/4.5.10 (Java/11.0.5)"},"type":"测试","content":"","method":"name.ealen.api.facade.AppController#sayHello","args":null,"respBody":{"code":"200","desc":"OK","message":"请求成功","dateTime":"2020-09-16 16:01:04","body":"hello EalenXie"},"logDate":1600243264780,"costTime":1,"threadName":"http-nio-8080-exec-3","threadId":33,"success":true}
+2020-09-16 16:01:04.782  INFO 2012 --- [AsyncExecutor-2] name.ealen.infra.advice.AopLogCollector  : {"appName":"app-template","host":"127.0.0.1","port":8080,"clientIp":"192.168.110.1","reqUrl":"http://localhost:8080/app/sayHello","httpMethod":"GET","headers":{"User-Agent":"Apache-HttpClient/4.5.10 (Java/11.0.5)"},"type":"测试","content":"","method":"name.ealen.api.facade.AppController#sayHello","args":null,"respBody":{"code":"200","desc":"OK","message":"请求成功","dateTime":"2020-09-16 16:01:04","body":"hello aop-log"},"logDate":1600243264780,"costTime":1,"threadName":"http-nio-8080-exec-3","threadId":33,"success":true}
 ```
 
 #### 埋点日志对象LogData属性说明
@@ -151,7 +153,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 /**
- * @author EalenXie create on 2020/6/22 14:28
+ * @author wjw465150 create on 2020/6/22 14:28
  */
 @AopLog(tag = "测试", stackTraceOnErr = true)
 @RestController
@@ -166,7 +168,7 @@ public class AppController {
         //.....
         LogData.step("3. service的方法执行完成");
         //.....
-        return RespBody.ok("hello EalenXie");
+        return RespBody.ok("hello aop-log");
     }
 
 }
@@ -176,7 +178,7 @@ public class AppController {
 此时再次接口调用 `/say/hello` 测试即可看看到控制台打印出结果，重点观察content字段 :
 
 ```
-2020-09-16 17:26:20.285  INFO 3284 --- [AsyncExecutor-2] name.ealen.infra.advice.AopLogCollector  : {"appName":"app-template","host":"127.0.0.1","port":8080,"clientIp":"192.168.110.1","reqUrl":"http://localhost:8080/app/sayHello","httpMethod":"GET","headers":{"User-Agent":"Apache-HttpClient/4.5.10 (Java/11.0.5)"},"tag":"测试","content":"1. 第一步执行完成\n2. 第二步执行完成\n3. service的方法执行完成\n","method":"name.ealen.api.facade.AppController#sayHello","args":null,"respBody":{"code":"200","desc":"OK","message":"请求成功","dateTime":"2020-09-16 17:26:20","body":"hello EalenXie"},"logDate":1600248380283,"costTime":1,"threadName":"http-nio-8080-exec-2","threadId":32,"success":true}
+2020-09-16 17:26:20.285  INFO 3284 --- [AsyncExecutor-2] name.ealen.infra.advice.AopLogCollector  : {"appName":"app-template","host":"127.0.0.1","port":8080,"clientIp":"192.168.110.1","reqUrl":"http://localhost:8080/app/sayHello","httpMethod":"GET","headers":{"User-Agent":"Apache-HttpClient/4.5.10 (Java/11.0.5)"},"tag":"测试","content":"1. 第一步执行完成\n2. 第二步执行完成\n3. service的方法执行完成\n","method":"name.ealen.api.facade.AppController#sayHello","args":null,"respBody":{"code":"200","desc":"OK","message":"请求成功","dateTime":"2020-09-16 17:26:20","body":"hello aop-log"},"logDate":1600248380283,"costTime":1,"threadName":"http-nio-8080-exec-2","threadId":32,"success":true}
 ```
 
 ```
@@ -201,7 +203,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 
 /**
- * Created by EalenXie on 2021/7/14 10:29
+ * Created by wjw465150 on 2021/7/14 10:29
  * 自定义切面
  */
 @Aspect
@@ -233,7 +235,3 @@ public class CustomLogDataAspect {
 }
 
 ```
-
-#### Change Notes:
-
-有关更改的详细信息，请参阅[发布说明](https://github.com/EalenXie/aop-log/releases)。
