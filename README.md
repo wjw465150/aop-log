@@ -1,7 +1,7 @@
 AopLog
 ==================
 
-#### AopLog是基于SpringAop和ThreadLocal实现的一个对请求方法埋点信息收集与处理的日志工具包。
+**AopLog是基于SpringAop和ThreadLocal实现的一个对请求方法埋点信息收集与处理的日志工具包。**
 
 设计目的和场景 :
 
@@ -29,6 +29,7 @@ AopLog
 #### 或者通过gradle引入
 
 ```gradle
+// https://mvnrepository.com/artifact/com.github.wjw465150/aop-log
 implementation group: 'com.github.wjw465150', name: 'aop-log', version: '2.7'
 ```
 

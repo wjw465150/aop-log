@@ -13,7 +13,7 @@ apply from: rootDir.canonicalPath + '/.gradle/publish.gradle'
 // jar包的名字
 archivesBaseName = 'aop-log'
 
-group = 'org.wjw.bpoint'
+group = 'com.github.wjw465150'  //Sonatype上的Issue里填写的`Group Id`,可以跟package路径完全不一样
 version = '2.7'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
@@ -63,8 +63,8 @@ publishing {
   publications {
     mavenJava(MavenPublication) {
       // groupId,artifactId,version，如果不定义，则会按照默认值执行
-      groupId = "com.github.wjw465150"
-      artifactId = "aop-log"
+      groupId = project.group  //Sonatype上的Issue里填写的`Group Id`,可以跟package路径完全不一样
+      artifactId = project.name
       version = project.version
  
       from components.java
